@@ -1,0 +1,18 @@
+[
+    {
+        "downloadFor": "enderal",
+        "assignGame": "skyrim"
+    },
+    {
+        "downloadFor": "enderalspecialedition",
+        "assignGame": "skyrimse"
+    },
+    {
+        "downloadFor": "skyrimse",
+        "assignGame": "skyrimvr"
+    },
+    {
+        "downloadFor": "fallout4",
+        "assignGame": "fallout4vr"
+    }
+]
