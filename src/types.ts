@@ -7,4 +7,5 @@ export interface IDownloadWithID extends types.IDownload {
 export interface IDownloadAssignmentRule {
     downloadFor: string;
     assignGame: string;
+    timeAdded?: number;
 }

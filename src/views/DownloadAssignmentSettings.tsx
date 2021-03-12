@@ -4,7 +4,7 @@ import { Button, ControlLabel, FormGroup, HelpBlock, Table } from 'react-bootstr
 import { withTranslation } from 'react-i18next';
 import { connect } from 'react-redux';
 import { IDownloadAssignmentRule } from '../types';
-import { addAutoAssignRule, deleteAutoAssignRule } from '../actions';
+import { addAutoAssignRule, deleteAutoAssignRule, resetAutoAssignRules } from '../actions';
 
 interface IConnectedProps {
     rules: IDownloadAssignmentRule[];
@@ -16,13 +16,14 @@ interface IConnectedProps {
 interface IActionProps {
     addRule: (rule: IDownloadAssignmentRule) => void;
     deleteRule: (rule: IDownloadAssignmentRule) => void;
+    resetToDefaults: () => void;
 }
 
 type IProps = IConnectedProps & IActionProps;
 
 interface IState {
-    downloadFor?: string;
-    assignGame?: string;
+    downloadFor: string;
+    assignGame: string;
 }
 
 class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
@@ -35,7 +36,7 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
     }
 
     render() {
-        const { t } = this.props;
+        const { t, resetToDefaults } = this.props;
         const { downloadFor, assignGame } = this.state;
 
         return (
@@ -59,7 +60,6 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
                             </tr>
                         </thead>
                         <tbody>
-                            {this.ruleList()}
                             <tr>
                                 <td>
                                 <select className='form-control' value={downloadFor} onChange={this.handleDownloadFor.bind(this)}>
@@ -77,8 +77,10 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
                                 <Button disabled={!downloadFor || !assignGame} title={t('Add new rule')} onClick={this.addNewRule.bind(this)}><Icon name='add' /></Button>
                                 </td>
                             </tr>
+                            {this.ruleList()}
                         </tbody>
                     </Table>
+                    <Button onClick={this.defaults.bind(this)}><Icon name='refresh' />{t('Reset to defaults')}</Button>
                 </FormGroup>
             </form>
         )
@@ -100,10 +102,16 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
 
     addNewRule() {
         const { downloadFor, assignGame } = this.state;
-        const { addRule } = this.props;
-        addRule({downloadFor, assignGame});
+        const { addRule, rules } = this.props;
+        const existingRule = rules.find(r => r.assignGame === assignGame && r.downloadFor === downloadFor);
+        if (!existingRule) addRule({downloadFor, assignGame });
         this.nextState.assignGame = '';
         this.nextState.downloadFor = '';
+    }
+
+    defaults() {
+        const { resetToDefaults } = this.props;
+        resetToDefaults();
     }
 
     gameList(primary: boolean): JSX.Element {
@@ -123,9 +131,10 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
 
     ruleList(): JSX.Element {
         const { t, rules, deleteRule, gameName } = this.props;
-        const listing =  rules.map(rule => {
+        const listing =  rules.sort(sortRulesByTime).map(rule => {
+            const ruleAdded: string = (rule.timeAdded > 0) ? new Date(rule.timeAdded).toLocaleDateString() : t('by default');
             return (
-                <tr>
+                <tr title={t('Rule created {{ruleAdded}}', { replace: { ruleAdded } })}>
                     <td>{gameName(rule.downloadFor)}</td>
                     <td>{gameName(rule.assignGame)}</td>
                     <td><Button onClick={() => deleteRule(rule)} title={t('Delete rule')}><Icon name='delete' /></Button></td>
@@ -136,6 +145,10 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
         return (<>{listing}</>);
 
     }
+}
+
+function sortRulesByTime(a: IDownloadAssignmentRule, b: IDownloadAssignmentRule) {
+    return a.timeAdded > b.timeAdded ? 1 : -1;
 }
 
 function mapStateToProps(state: any): IConnectedProps {
@@ -155,6 +168,7 @@ function mapDispatchToProps(dispatch: any): IActionProps {
     return {
         addRule: (rule: IDownloadAssignmentRule): void => dispatch(addAutoAssignRule(rule.downloadFor, rule.assignGame)),
         deleteRule: (rule: IDownloadAssignmentRule): void => dispatch(deleteAutoAssignRule(rule.downloadFor, rule.assignGame)),
+        resetToDefaults: (): void => dispatch(resetAutoAssignRules(undefined)),
     }
 }
 
