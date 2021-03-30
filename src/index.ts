@@ -26,12 +26,12 @@ function updateGames(prevDLs: {[id: string]: types.IDownload}, newDLs: {[id: str
 
       // Get the discovered game, as we won't assigning any downloads where the target game is not discovered.
       const state: types.IState = api.store.getState();
-      const rules : IDownloadAssignmentRule[] = util.getSafe(state, ['settings', 'downloads', 'autoAssigner', 'rules'], []);
+      const rules : IDownloadAssignmentRule[] = util.getSafe(state, ['settings', 'downloadAssigner', 'rules'], []);
       const games: {[id: string]: types.IDiscoveredTool} = util.getSafe(state, ['settings', 'gameMode', 'discovered'], {});
 
       found.forEach((newDownload) => {
         // Filter to only process relevant rules, where the game array includes the "downloadFor" rule value.
-        const filteredRules = rules.filter(r => !newDownload.game.includes(r.downloadFor));
+        const filteredRules = rules.filter(r => newDownload.game.includes(r.downloadFor));
         filteredRules.forEach((rule) => {
             // Ignore games that aren't currently discovered.
             if (!games[rule.assignGame]) return;

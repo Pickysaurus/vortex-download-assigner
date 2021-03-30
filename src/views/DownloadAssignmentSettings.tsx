@@ -36,8 +36,10 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
     }
 
     render() {
-        const { t, resetToDefaults } = this.props;
+        const { t } = this.props;
         const { downloadFor, assignGame } = this.state;
+
+        const recommendTitle: string = t('Use a set of recommended defaults based on the common combinations of games this feature would be useful for.');
 
         return (
             <form>
@@ -45,11 +47,15 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
                     <ControlLabel>
                         {t('Download Game Assignments')}
                         <More id='more-downloadassigner' name={t('Download Game Assignment')}>
-                            Help text here!
+                            {t(
+                                'When Vortex adds a new download from Nexus Mods, these settings will be used to decide which games to assign as compatible to each archive.'
+                                +'This will prevent Vortex from reminding you that the mod was intended for a different game during installation and ensure it correctly shows up '
+                                +'in the downloads tab while your preferred game is active.'
+                            )}
                         </More>
                     </ControlLabel>
                     <HelpBlock>
-                        Additional help text.
+                        {t('Add a new row to automatically mark downloaded archives for the game in the first column as compatible with game in the second column.')}
                     </HelpBlock>
                     <Table>
                         <thead>
@@ -80,7 +86,7 @@ class DownloadAssignmentSettings extends ComponentEx<IProps,IState> {
                             {this.ruleList()}
                         </tbody>
                     </Table>
-                    <Button onClick={this.defaults.bind(this)}><Icon name='refresh' />{t('Reset to defaults')}</Button>
+                    <Button title={recommendTitle} onClick={this.defaults.bind(this)}><Icon name='smart' /> {t('Use recommended')}</Button>
                 </FormGroup>
             </form>
         )

@@ -22,6 +22,11 @@ const defaultRules: IDownloadAssignmentRule[] = [
         downloadFor: "fallout4",
         assignGame: "fallout4vr",
         timeAdded: 2
+    },
+    {
+        downloadFor: "xcom2",
+        assignGame: "xcom2-wotc",
+        timeAdded: 4
     }
 ];
 
